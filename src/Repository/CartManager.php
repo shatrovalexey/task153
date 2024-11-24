@@ -11,7 +11,7 @@ use Raketa\BackendTestTask\Infrastructure\ConnectorFacade;
 
 class CartManager extends ConnectorFacade
 {
-    public $logger;
+    public LoggerInterface $logger;
 
     public function __construct($host, $port, $password)
     {
@@ -19,32 +19,34 @@ class CartManager extends ConnectorFacade
         parent::build();
     }
 
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): static
     {
         $this->logger = $logger;
+
+		return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function saveCart(Cart $cart)
+    public function saveCart(Cart $cart): bool
     {
         try {
-            $this->connector->set($cart, session_id());
+            return $this->connector->set($cart, session_id());
         } catch (Exception $e) {
-            $this->logger->error('Error');
+            $this->logger->error($e->getMessage());
         }
     }
 
     /**
      * @return ?Cart
      */
-    public function getCart()
+    public function getCart(): ?Cart
     {
         try {
             return $this->connector->get(session_id());
         } catch (Exception $e) {
-            $this->logger->error('Error');
+            $this->logger->error($e->getMessage());
         }
 
         return new Cart(session_id(), []);

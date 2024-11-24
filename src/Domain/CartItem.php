@@ -4,19 +4,23 @@ declare(strict_types = 1);
 
 namespace Raketa\BackendTestTask\Domain;
 
+use Raketa\BackendTestTask\Infrastructure\Codec;
+
 final readonly class CartItem
 {
+	public ?string $uuid;
+
     public function __construct(
-        public string $uuid,
         public string $productUuid,
         public float $price,
         public int $quantity,
     ) {
+		$this->uuid = static::getUuid();
     }
 
-    public function getUuid(): string
+    public static function getUuid(): string
     {
-        return $this->uuid;
+		return Codec::uuid();
     }
 
     public function getProductUuid(): string

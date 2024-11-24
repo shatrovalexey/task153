@@ -16,40 +16,41 @@ class ProductRepository
         $this->connection = $connection;
     }
 
-    public function getByUuid(string $uuid): Product
+    public function getByUuid(string $uuid): ?Product
     {
-        $row = $this->connection->fetchOne(
-            "SELECT * FROM products WHERE uuid = " . $uuid,
-        );
-
-        if (empty($row)) {
-            throw new Exception('Product not found');
-        }
-
-        return $this->make($row);
+        return ($row = $this->connection->fetchOne('
+SELECT
+	p1.*
+FROM
+	products AS p1
+WHERE
+	(p1.uuid = :uuid);
+		', [':uuid' => $uuid,])) ? $this->make($row) : null;
     }
 
     public function getByCategory(string $category): array
     {
         return array_map(
             static fn (array $row): Product => $this->make($row),
-            $this->connection->fetchAllAssociative(
-                "SELECT id FROM products WHERE is_active = 1 AND category = " . $category,
-            )
+            $this->connection->fetchAllAssociative('
+SELECT
+	id
+FROM
+	products
+WHERE
+	(is_active = :is_active) AND
+	(category = :category);
+			', [
+				':is_active' => 1
+				, ':category' =>  $category,
+			])
         );
     }
 
     public function make(array $row): Product
     {
-        return new Product(
-            $row['id'],
-            $row['uuid'],
-            $row['is_active'],
-            $row['category'],
-            $row['name'],
-            $row['description'],
-            $row['thumbnail'],
-            $row['price'],
-        );
+        return new Product(... array_map(function (string $key) use (array &$row): array {
+			return $row[$key];
+        }, ['id', 'uuid', 'is_active', 'category', 'name', 'description', 'thumbnail', 'price',]));
     }
 }

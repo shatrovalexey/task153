@@ -6,26 +6,26 @@ namespace Raketa\BackendTestTask\Infrastructure;
 
 use Raketa\BackendTestTask\Domain\Cart;
 use Redis;
-use RedisException;
+use Raketa\BackendTestTask\Infrastructure\{Codec, ConnectorException};
 
 class Connector
 {
-    private Redis $redis;
+	protected const DELAY = 24 * 60 * 60;
+    protected Redis $redis;
 
-    public function __construct($redis)
+    public function __construct(protected Redis $redis)
     {
-        return $this->redis = $redis;
     }
 
     /**
      * @throws ConnectorException
      */
-    public function get(Cart $key)
+    public function get(string $key)
     {
         try {
-            return unserialize($this->redis->get($key));
-        } catch (RedisException $e) {
-            throw new ConnectorException('Connector error', $e->getCode(), $e);
+            return Codec::decode($this->redis->get($key));
+        } catch (ConnectorException $e) {
+            throw $e;
         }
     }
 
@@ -35,13 +35,13 @@ class Connector
     public function set(string $key, Cart $value)
     {
         try {
-            $this->redis->setex($key, 24 * 60 * 60, serialize($value));
-        } catch (RedisException $e) {
-            throw new ConnectorException('Connector error', $e->getCode(), $e);
+            $this->redis->setex($key, static::DELAY, Codec::encode($value));
+        } catch (ConnectorException $e) {
+            throw $e;
         }
     }
 
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return $this->redis->exists($key);
     }

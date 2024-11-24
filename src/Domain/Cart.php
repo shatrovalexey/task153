@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Raketa\BackendTestTask\Domain;
 
+use Raketa\BackendTestTask\Repository\Entity\Product;
+
 final class Cart
 {
     public function __construct(
@@ -37,5 +39,10 @@ final class Cart
     public function addItem(CartItem $item): void
     {
         $this->items[] = $item;
+    }
+
+    public function addItem(Product $product, int $quantity): array
+    {
+        return $this->items[] = new CartItem($product->getUuid(), $product->getPrice(), $quantity);
     }
 }

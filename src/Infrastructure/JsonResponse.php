@@ -2,11 +2,10 @@
 
 declare(strict_types = 1);
 
-namespace Raketa\BackendTestTask\Controller;
+namespace Raketa\BackendTestTask\Infrastructure;
 
-use Psr\Http\Message\MessageInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\{MessageInterface, ResponseInterface, StreamInterface};
+use Raketa\BackendTestTask\Infrastructure\Codec;
 
 /**
  * Класс заглушка
@@ -82,4 +81,17 @@ final class JsonResponse implements ResponseInterface
     {
         // TODO: Implement getReasonPhrase() method.
     }
+
+	protected function setData($data): static
+	{
+		return $response->getBody()->write(Codec::encode($data));
+	}
+
+	public static function getResponse($data, int $status = 200): ResponseInterface
+	{
+        return (new static())
+			->setData($data)
+            ->withHeader('Content-Type', 'application/json; charset=utf-8')
+            ->withStatus($status);
+	}
 }

@@ -12,18 +12,18 @@ readonly class ProductsView
     ) {
     }
 
+	protected static function _getMethodName(string $key): string
+	{
+		return 'get' . ucfirst($key);
+	}
+
     public function toArray(string $category): array
     {
         return array_map(
-            fn (Product $product) => [
-                'id' => $product->getId(),
-                'uuid' => $product->getUuid(),
-                'category' => $product->getCategory(),
-                'description' => $product->getDescription(),
-                'thumbnail' => $product->getThumbnail(),
-                'price' => $product->getPrice(),
-            ],
-            $this->productRepository->getByCategory($category)
+            fn (Product $product) => array_map(
+				fn (string $key) => $product->{static::_getMethodName($key)}()
+				, ['id', 'uuid', 'category', 'description', 'thumbnail', 'price',]
+			), $this->productRepository->getByCategory($category)
         );
     }
 }

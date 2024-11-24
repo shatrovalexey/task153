@@ -30,11 +30,8 @@ class ConnectorFacade
 
         try {
             $isConnected = $redis->isConnected();
-            if (! $isConnected && $redis->ping('Pong')) {
-                $isConnected = $redis->connect(
-                    $this->host,
-                    $this->port,
-                );
+            if (!$isConnected && $redis->ping('Pong')) {
+                $isConnected = $redis->connect($this->host, $this->port,);
             }
         } catch (RedisException) {
         }
