@@ -13,7 +13,6 @@ class ConnectorFacade
     public int $port = 6379;
     public ?string $password = null;
     public ?int $dbindex = null;
-
     public $connector;
 
     public function __construct($host, $port, $password, $dbindex)
@@ -24,7 +23,7 @@ class ConnectorFacade
         $this->dbindex = $dbindex;
     }
 
-    protected function build(): void
+    public function build(): void
     {
         $redis = new Redis();
 

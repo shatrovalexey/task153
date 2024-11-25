@@ -4,16 +4,14 @@ declare(strict_types = 1);
 
 namespace Raketa\BackendTestTask\Controller;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Raketa\BackendTestTask\View\ProductsView;
+use Raketa\BackendTestTask\View\ProductView;
 use Raketa\BackendTestTask\Infrastructure\Codec;
 use Raketa\BackendTestTask\Controller\{JsonResponse, JsonRequest};
 
-readonly class ProductsController
+readonly class ProductController
 {
     public function __construct(
-        private ProductsView $productsVew
+        private ProductView $productsVew
     ) {
     }
 
@@ -22,6 +20,6 @@ readonly class ProductsController
         $response = new JsonResponse();
         $rawRequest = $request->getData();
 
-        return $response->getResponse($this->productsVew->toArray($rawRequest['category']));
+        return $response->getResponse($this->productVew->toArray($rawRequest['category']));
     }
 }
